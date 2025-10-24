@@ -1,5 +1,5 @@
 {
-  "name": "mini-tasks",
+  "name": "task-service",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
