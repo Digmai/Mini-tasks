@@ -177,10 +177,10 @@ type Task = {
 
 ```mermaid
 flowchart LR
-  A[Developer CLI] --> B(Task Service CLI)
-  A --> C(Notification Service CLI)
-  A --> D(API Gateway CLI)
-  B --> E[Local DB (tasks.json / SQLite)]
+  A[Developer CLI] --> B[Task Service CLI]
+  A --> C[Notification Service CLI]
+  A --> D[API Gateway CLI]
+  B --> E[Local DB: tasks.json or SQLite]
   C --> F[logs/notify.log]
 ```
 
