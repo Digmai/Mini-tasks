@@ -1,75 +1,65 @@
-// Простая in-memory база (пока без БД)
-const tasks: Record<string, { id: string; title: string; completed: boolean }> =
-  {};
+type Task = { id: string; title: string; completed: boolean };
+const tasks: Record<string, Task> = {};
 
 const server = Bun.serve({
   port: 8000,
-  async fetch(req) {
-    const url = new URL(req.url);
-    const { pathname } = url;
-    switch (req.method) {
-      // GET /tasks — получить данные задачи.
-      case "GET":
-        if (pathname === "/tasks") {
-          return new Response(JSON.stringify(Object.values(tasks)), {
-            headers: { "Content-Type": "application/json" },
-          });
-        } else if (pathname.startsWith("/tasks/")) {
-          const id = pathname.split("/")[2];
-          const task = tasks[id];
-          if (task) {
-            return new Response(JSON.stringify(task), {
-              headers: { "Content-Type": "application/json" },
-            });
-          }
-        }
-        break;
-      // POST  /tasks — создать новую задачу.
-      case "POST":
-        if (pathname === "/tasks") {
-          const id = crypto.randomUUID();
-          const body = JSON.parse(await req.text());
+  routes: {
+    // 📘 Получить все задачи
+    "/tasks": {
+      GET: () => Response.json(Object.values(tasks)),
 
-          const newTask = {
-            id,
-            title: body.title || "Untitled Task",
-            completed: false,
-          };
-          tasks[id] = newTask;
+      // 📗 Создать новую задачу
+      POST: async (req) => {
+        const body = await req.json();
+        const id = crypto.randomUUID();
+        const task: Task = {
+          id,
+          title: body.title || "Untitled Task",
+          completed: false,
+        };
+        tasks[id] = task;
+        return Response.json(task, { status: 201 });
+      },
+    },
 
-          return Response.json(newTask, { status: 201 });
-        }
-        break;
-      // PATCH /tasks/:id — частично изменить существующую задачу.
-      case "PATCH":
-        if (pathname.startsWith("/tasks/")) {
-          const id = pathname.split("/")[2];
-          const task = tasks[id];
-          if (task) {
-            const body = JSON.parse(await req.text());
-            task.completed = body.completed ?? task.completed;
-            task.title = body.title ?? task.title;
+    // 📙 Получить / обновить / удалить по ID
+    "/tasks/:id": {
+      GET: (req) => {
+        const { id } = req.params;
+        const task = tasks[id];
+        return task
+          ? Response.json(task)
+          : new Response("Not Found", { status: 404 });
+      },
 
-            return Response.json(task);
-          }
-        }
-        break;
-      // DELETE /tasks/:id — удалить задачу.
-      case "DELETE":
-        if (pathname.startsWith("/tasks/")) {
-          const id = pathname.split("/")[2];
-          if (tasks[id]) {
-            delete tasks[id];
-            return new Response(null, { status: 204 });
-          }
-        }
-        break;
-      default:
-        return new Response("405 Method Not Allowed", { status: 405 });
-    }
+      PATCH: async (req) => {
+        const { id } = req.params;
+        const task = tasks[id];
+        if (!task) return new Response("Not Found", { status: 404 });
 
-    return new Response("404 Not Found", { status: 404 });
+        const body = await req.json();
+        task.title = body.title ?? task.title;
+        task.completed = body.completed ?? task.completed;
+        return Response.json(task);
+      },
+
+      DELETE: (req) => {
+        const { id } = req.params;
+        if (!tasks[id]) return new Response("Not Found", { status: 404 });
+        delete tasks[id];
+        return new Response(null, { status: 204 });
+      },
+    },
+  },
+
+  // 🧭 Обработка неизвестных маршрутов
+  fetch(req) {
+    return new Response(`No route for ${new URL(req.url).pathname}`, {
+      status: 404,
+    });
   },
 });
 
-console.log(`Server running at http://${server.hostname}:${server.port}`);
+console.log(
+  `🚀 API Gateway running at http://${server.hostname}:${server.port}`
+);
