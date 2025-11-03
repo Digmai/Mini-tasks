@@ -1,11 +1,17 @@
 {
   "name": "notification-service",
-  "module": "index.ts",
-  "type": "module",
+  "main": "index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3"
   }
 }
