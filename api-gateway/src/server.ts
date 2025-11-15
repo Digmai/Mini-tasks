@@ -1,4 +1,7 @@
+import { connectRabbitMQ } from "./rabbitmq";
 import { taskRoutes } from "./routes";
+
+connectRabbitMQ();
 
 const server = Bun.serve({
   port: 8000,

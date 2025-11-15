@@ -14,7 +14,7 @@ export const taskRoutes = {
 
   "/tasks/:id": {
     GET: (req: any) => getTaskById(req.params.id),
-    PATCH: (req: any) => updateTask(req, req.params.id),
+    PATCH: (req: any) => updateTask(req),
     DELETE: (req: any) => deleteTask(req.params.id),
   },
 };

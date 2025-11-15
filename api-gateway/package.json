@@ -7,5 +7,9 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@types/amqplib": "^0.10.8",
+    "amqplib": "^0.10.9"
+  }
 }
