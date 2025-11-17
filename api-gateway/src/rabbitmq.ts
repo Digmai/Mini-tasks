@@ -18,29 +18,35 @@ export async function sendRpcMessage(
   queue: string,
   message: RpcMessageTasks
 ): Promise<Task> {
-  return new Promise((resolve) => {
-    const correlationId = randomUUID();
+  return new Promise(async (resolve, reject) => {
+    try {
+      const correlationId = randomUUID();
 
-    // Создаём временную очередь для ответа
-    channel.assertQueue(QUEUE_NAME, { exclusive: false }).then((q) => {
-      const replyQueue = q.queue;
+      // создаём временную очередь для ответа
+      const { queue: replyQueue } = await channel.assertQueue("", {
+        exclusive: true,
+      });
 
-      channel.consume(
+      // слушаем ответ
+      const consumerTag = await channel.consume(
         replyQueue,
         (msg) => {
           if (msg?.properties.correlationId === correlationId) {
             resolve(JSON.parse(msg.content.toString()));
+            channel.cancel(consumerTag.consumerTag); // останавливаем consumer после получения ответа
           }
         },
         { noAck: true }
       );
 
-      // Отправляем сообщение с указанием очереди для ответа
+      // отправляем сообщение в основную очередь
       channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), {
         correlationId,
         replyTo: replyQueue,
         persistent: true,
       });
-    });
+    } catch (err) {
+      reject(err);
+    }
   });
 }
