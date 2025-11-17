@@ -8,7 +8,7 @@ let channel: Channel;
 export const QUEUE_NAME = "task_queue";
 
 export async function connectRabbitMQ() {
-  connection = await connect("amqp://guest:guest@localhost:5672");
+  connection = await connect("amqp://guest:guest@rabbitmq:5672");
   channel = await connection.createChannel();
   await channel.assertQueue(QUEUE_NAME, { durable: true });
   console.log("🐇 API Gateway connected to RabbitMQ");
@@ -22,7 +22,7 @@ export async function sendRpcMessage(
     const correlationId = randomUUID();
 
     // Создаём временную очередь для ответа
-    channel.assertQueue(QUEUE_NAME, { exclusive: true }).then((q) => {
+    channel.assertQueue(QUEUE_NAME, { exclusive: false }).then((q) => {
       const replyQueue = q.queue;
 
       channel.consume(

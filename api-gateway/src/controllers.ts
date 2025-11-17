@@ -18,12 +18,7 @@ export const getAllTasks = async () => {
 export const createTask = async (req: Request) => {
   const body = await req.json();
 
-  if (
-    typeof body === "object" &&
-    typeof body.id === "string" &&
-    typeof body.title === "string" &&
-    typeof body.completed === "boolean"
-  ) {
+  if (typeof body.title === "string" && typeof body.completed === "boolean") {
     const result = await sendRpcMessage(QUEUE_NAME, {
       ...body,
       action: "POST",

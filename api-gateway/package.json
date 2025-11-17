@@ -1,15 +1,17 @@
 {
-  "name": "api-gateway",
-  "module": "index.ts",
+  "name": "notification-service",
+  "main": "index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "type": "module",
+  "scripts": {
+    "start": "bun run --no-cache src/index.ts"
+  },
   "dependencies": {
-    "@types/amqplib": "^0.10.8",
-    "amqplib": "^0.10.9"
+    "amqplib": "^0.10.3"
   }
 }
