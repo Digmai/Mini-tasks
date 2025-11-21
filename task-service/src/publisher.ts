@@ -25,7 +25,7 @@ export async function consumeMessages(rabbitUrl: string, queueName: string) {
     channel.sendToQueue(
       QUEUE_notifications, // очередь для уведомлений
       Buffer.from(JSON.stringify(result)),
-      { persistent: true } // обязательно тот же correlationId
+      { persistent: true }
     );
 
     // отправляем ответ в очередь replyTo
